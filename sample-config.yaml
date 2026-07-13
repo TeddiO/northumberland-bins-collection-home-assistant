@@ -1,0 +1,50 @@
+- resource: http://<app-hostname>:8080/collections
+  scan_interval: 21600
+  timeout: 60
+
+  sensor:
+    - name: Next Bin Collection
+      unique_id: northumberland_next_bin_collection
+      device_class: date
+      value_template: >-
+        {{ value_json.collections
+           | map(attribute='date')
+           | first
+           | default('unknown', true) }}
+      json_attributes:
+        - address
+        - status
+        - available
+        - warning
+        - fetched_at
+        - collections
+
+    - name: Next General Waste Collection
+      unique_id: northumberland_next_general_waste_collection
+      device_class: date
+      value_template: >-
+        {{ value_json.collections
+           | selectattr('type', 'equalto', 'general')
+           | map(attribute='date')
+           | first
+           | default('unknown', true) }}
+
+    - name: Next Recycling Collection
+      unique_id: northumberland_next_recycling_collection
+      device_class: date
+      value_template: >-
+        {{ value_json.collections
+           | selectattr('type', 'equalto', 'recycling')
+           | map(attribute='date')
+           | first
+           | default('unknown', true) }}
+
+    - name: Next Garden Waste Collection
+      unique_id: northumberland_next_garden_waste_collection
+      device_class: date
+      value_template: >-
+        {{ value_json.collections
+           | selectattr('type', 'equalto', 'garden')
+           | map(attribute='date')
+           | first
+           | default('unknown', true) }}

@@ -1,0 +1,18 @@
+name: Northumberland Bins
+slug: northumberland_bins
+description: Fetches bin collection dates from Northumberland County Council
+version: "0.0.3"
+
+arch:
+  - amd64
+  - aarch64
+
+startup: application
+boot: auto
+init: false
+
+options:
+  uprn: ""
+
+schema:
+  uprn: str

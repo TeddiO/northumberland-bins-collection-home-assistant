@@ -1,0 +1,7 @@
+services:
+  northumberland-bins:
+    build: .
+    environment:
+      UPRN: "${UPRN:?Set UPRN in the environment or a .env file}"
+    ports:
+      - "8080:8080"
