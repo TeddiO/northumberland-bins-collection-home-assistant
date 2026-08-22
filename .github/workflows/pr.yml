@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version-file: home-assistant/go.mod
-          cache-dependency-path: home-assistant/go.sum
+          cache-dependency-path: home-assistant/go.mod
 
       - name: Run tests
         working-directory: home-assistant
