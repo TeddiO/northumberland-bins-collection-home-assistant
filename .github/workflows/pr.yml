@@ -1,0 +1,47 @@
+name: Pull Request
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build container
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: home-assistant/go.mod
+          cache-dependency-path: home-assistant/go.mod
+
+      - name: Run tests
+        working-directory: home-assistant
+        run: go test ./...
+
+      - name: Run vet
+        working-directory: home-assistant
+        run: go vet ./...
+
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Run govulncheck
+        working-directory: home-assistant
+        run: govulncheck ./...
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build container
+        uses: docker/build-push-action@v7
+        with:
+          context: ./home-assistant
+          file: ./home-assistant/Dockerfile
+          push: false

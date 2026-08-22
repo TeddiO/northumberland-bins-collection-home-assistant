@@ -1,3 +1,3 @@
 module github.com/TeddiO/northumberland-bins-collection-home-assistant
 
-go 1.26.5
+go 1.27
