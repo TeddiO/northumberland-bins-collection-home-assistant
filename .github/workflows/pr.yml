@@ -15,6 +15,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: home-assistant/go.mod
+          cache-dependency-path: home-assistant/go.sum
+
+      - name: Run tests
+        working-directory: home-assistant
+        run: go test ./...
+
+      - name: Run vet
+        working-directory: home-assistant
+        run: go vet ./...
+
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Run govulncheck
+        working-directory: home-assistant
+        run: govulncheck ./...
+
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v4
 
