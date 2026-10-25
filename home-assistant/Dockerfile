@@ -18,4 +18,6 @@ COPY --from=build /etc/ssl/certs/ca-certificates.crt \
 
 COPY --from=build /northumberland-bins /northumberland-bins
 
+USER 65532:65532
+
 ENTRYPOINT ["/northumberland-bins"]
