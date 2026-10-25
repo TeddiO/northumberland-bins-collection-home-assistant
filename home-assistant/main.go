@@ -145,22 +145,54 @@ func main() {
 }
 
 func loadHomeAssistantUPRN() (string, error) {
-	body, err := os.ReadFile("/data/options.json")
-	if err != nil {
-		if os.IsNotExist(err) {
-			return "", nil
-		}
-
-		return "", fmt.Errorf("read Home Assistant options: %w", err)
+	token := os.Getenv("SUPERVISOR_TOKEN")
+	if token == "" {
+		return "", nil
 	}
 
-	var options AppOptions
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+		CheckRedirect: func(request *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 
-	if err := json.Unmarshal(body, &options); err != nil {
+	return fetchHomeAssistantUPRN(client, token)
+}
+
+func fetchHomeAssistantUPRN(client *http.Client, token string) (string, error) {
+	request, err := http.NewRequest(http.MethodGet, "http://supervisor/addons/self/info", nil)
+	if err != nil {
+		return "", fmt.Errorf("create Home Assistant options request: %w", err)
+	}
+	request.Header.Set("Authorization", "Bearer "+token)
+
+	response, err := client.Do(request)
+	if err != nil {
+		return "", fmt.Errorf("read Home Assistant options from Supervisor: %w", err)
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("read Home Assistant options from Supervisor: HTTP %d", response.StatusCode)
+	}
+
+	var payload struct {
+		Result string `json:"result"`
+		Data   struct {
+			Options AppOptions `json:"options"`
+		} `json:"data"`
+	}
+
+	if err := json.NewDecoder(response.Body).Decode(&payload); err != nil {
 		return "", fmt.Errorf("decode Home Assistant options: %w", err)
 	}
 
-	return strings.TrimSpace(options.UPRN), nil
+	if payload.Result != "ok" {
+		return "", fmt.Errorf("read Home Assistant options from Supervisor: unsuccessful response")
+	}
+
+	return strings.TrimSpace(payload.Data.Options.UPRN), nil
 }
 
 func newClient(baseURL string, debug bool) (*Client, error) {

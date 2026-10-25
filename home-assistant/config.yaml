@@ -1,7 +1,7 @@
 name: Northumberland Bins
 slug: northumberland_bins
 description: Fetches bin collection dates from Northumberland County Council
-version: "1.0.0"
+version: "1.0.1"
 
 arch:
   - amd64
