@@ -172,16 +172,6 @@ Home Assistant requests updated collection data every six hours:
 scan_interval: 21600
 ```
 
-## Container security
-
-Both container images use a minimal `scratch` runtime and run as the
-unprivileged UID/GID `65532:65532`. Port `8080` does not require root privileges.
-Any mounted configuration files, including Home Assistant's `/data/options.json`,
-must be readable by this user.
-
-Pull request CI uses commit-pinned GitHub Actions, grants only read access to
-repository contents for the build job, and does not persist checkout credentials.
-
 ## Troubleshooting
 
 ### The app says that the UPRN is required
